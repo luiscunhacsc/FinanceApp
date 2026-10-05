@@ -44,7 +44,7 @@ test('bloqueia saldo insuficiente e preserva dados após uma remoção inválida
   await movement(page, 'deposit', '100'); await page.getByRole('button', { name: 'Guardar movimento' }).click(); await expect(page.getByRole('dialog')).toHaveCount(0);
   await movement(page, 'withdrawal', '50'); await page.getByRole('button', { name: 'Guardar movimento' }).click(); await expect(page.getByRole('dialog')).toHaveCount(0);
   const row = page.getByRole('row').filter({ hasText: 'Entrada de dinheiro' }); await row.getByRole('button', { name: /Eliminar movimento/ }).click(); await page.getByRole('button', { name: 'Confirmar eliminação' }).click();
-  await expect(page.locator('.toast')).toContainText('Saldo insuficiente'); await page.getByRole('button', { name: 'Cancelar', exact: true }).click(); await expect(row).toBeVisible();
+  await expect(page.getByRole('dialog').getByRole('alert')).toContainText('Saldo insuficiente'); await page.getByRole('button', { name: 'Cancelar', exact: true }).click(); await expect(row).toBeVisible();
 });
 test('CSV de movimentos, duplicados, transferência entre carteiras e observação', async ({ page }) => {
   await page.goto('/'); await createPortfolio(page, 'Principal'); await createPortfolio(page, 'Reserva');

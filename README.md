@@ -4,7 +4,7 @@ Aplicação pessoal de acompanhamento de investimentos, em português europeu. *
 
 ## Começar
 
-Instale [Node.js](https://nodejs.org/) 22.12 ou superior. Na pasta do projeto         :
+Instale [Node.js](https://nodejs.org/) 22.12 ou superior. Na pasta do projeto:
 
 ```powershell
 npm ci

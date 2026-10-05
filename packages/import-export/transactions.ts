@@ -21,6 +21,9 @@ export function parseTransactionsCSV(text: string, portfolios: Portfolio[], exis
     try {
       if (row.length !== columns.length) throw new Error('Número de colunas incorreto.');
       const cell = (name: string) => { const v = row[columns.indexOf(name)].trim(); return /^'[=+\-@\t\r]/.test(v) ? v.slice(1) : v; };
+      const trade = ['buy', 'sell', 'opening'].includes(cell('kind'));
+      if (trade && !cell('currency')) throw new Error('Indique a moeda da transação.');
+      if (trade && cell('currency') !== 'EUR' && !cell('fx_rate')) throw new Error('Indique o câmbio de execução para a moeda estrangeira.');
       const transaction = transactionSchema.parse({ ...transactionDefaults, id: cell('id'), portfolioId: portfolioId(cell('portfolio')), at: cell('at'), kind: cell('kind'), symbol: cell('symbol') || undefined,
         quantity: inputDecimal(cell('quantity') || '0'), price: inputDecimal(cell('price') || '0'), fee: inputDecimal(cell('fee') || '0'), amount: inputDecimal(cell('amount') || '0'), currency: cell('currency') || 'EUR', fxRate: inputDecimal(cell('fx_rate') || '1'), openingValue: inputDecimal(cell('opening_value') || '0'),
         toPortfolioId: cell('to_portfolio') ? portfolioId(cell('to_portfolio')) : undefined, lotId: cell('lot_id') || undefined, note: cell('note'), order: ++order, origin: 'imported', createdAt: new Date().toISOString() });

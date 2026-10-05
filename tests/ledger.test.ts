@@ -93,4 +93,11 @@ describe('CSV de movimentos', () => {
   it('protege fórmulas na exportação sem alterar a nota na reimportação', () => {
     const item = { ...deposit, note: '=1+1' }; const csv = transactionsToCSV([item], portfolios); expect(csv).toContain("'=1+1"); expect(parseTransactionsCSV(csv, portfolios, [], []).transactions[0].note).toBe('=1+1');
   });
+  it('exige moeda e câmbio explícitos em compras em moeda estrangeira', () => {
+    const foreign = { ...buy, currency: 'USD', fxRate: '0.9' };
+    const csv = transactionsToCSV([deposit, foreign], portfolios);
+    expect(() => parseTransactionsCSV(csv.replace('"USD";"0.9"', '"USD";""'), portfolios, [], ['VWCE.DE'])).toThrow('câmbio de execução');
+    expect(() => parseTransactionsCSV(csv.replace('"USD";"0.9"', '"";"0.9"'), portfolios, [], ['VWCE.DE'])).toThrow('moeda da transação');
+    expect(parseTransactionsCSV(csv, portfolios, [], ['VWCE.DE']).transactions[1].fxRate).toBe('0.9');
+  });
 });

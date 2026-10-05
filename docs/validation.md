@@ -1,4 +1,22 @@
-# Validação do Marco 1
+# Validação
+
+## Marco 2 — versão 0.2.0
+
+Verificado em 05/10/2026, em Windows.
+
+- `npm run check`: 43 testes unitários/de integração aprovados; TypeScript validado; compilação de produção e service worker gerados.
+- Casos de resultado conhecido para caixa, FIFO, lote selecionado, comissões, vendas fracionadas, transferências, posições iniciais e valorização. Verificação de datas sem antecipação de preços, câmbios em falta e neutralização dos fluxos na variação monetária diária.
+- Testes de migração de uma base IndexedDB versão 1, backups completos versão 2, aceitação de backups anteriores e alterações inválidas sem perda de movimentos.
+- CSV: reimportação idêntica, conflitos, proteção de fórmulas e rejeição de compras sem moeda ou sem câmbio de execução em moeda estrangeira.
+- `npm run test:e2e`: 8 percursos aprovados em Chromium. Os quatro percursos anteriores continuam aprovados; os novos cobrem carteira/compra/venda parcial/lotes/privacidade, saldo insuficiente/eliminação inválida, CSV/duplicados/transferências/observação e painel móvel.
+- Inspeção visual do painel com posições, gráfico e saldos em 1440 px, nos temas claro e escuro, e em 390 px. No telemóvel, a largura do documento é 390 px; as tabelas têm deslocamento horizontal próprio. Nenhum erro de página foi registado no percurso visual.
+- Capturas reproduzíveis com `node scripts/portfolio-preview.mjs` enquanto `npm run preview` estiver ativo. O perfil é isolado e os dados sintéticos ficam identificados; não são acrescentados à base do utilizador.
+
+Os avisos não bloqueantes da compilação referem-se a módulos JavaScript acima de 500 kB e anotações de comentários na dependência Zod. O módulo de gráficos tem cerca de 531 kB antes de compressão (180 kB comprimido), é carregado quando necessário e fica disponível na cache offline. O service worker inclui 18 ficheiros, cerca de 1,18 MiB.
+
+Aplicação e proxy repostos localmente nas portas 4173 e 8787. Nenhum serviço foi publicado e nenhum plano pago foi ativado. O proxy não foi alterado neste marco; os testes de navegador simulam a fonte de cotações. As consultas reais documentadas abaixo pertencem à validação do Marco 1.
+
+## Marco 1 — registo da entrega anterior
 
 Verificado em 05/10/2026, em Windows com Node.js 24.21.0.
 
