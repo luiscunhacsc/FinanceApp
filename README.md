@@ -19,6 +19,8 @@ Abra o endereço apresentado no terminal, normalmente `http://127.0.0.1:5173`. N
 4. Consulte **Visão geral** para ver património, posições, dinheiro, ganhos e evolução do capital.
 5. Guarde um backup JSON ou CSV. Os dados permanecem no navegador deste dispositivo.
 
+**Já usa My Portfolio no Yahoo Finance?** Em **Carteiras e transações → Importar movimentos CSV**, selecione diretamente o ficheiro exportado. A aplicação reconhece o formato e apresenta uma revisão de moedas, comissões, compras/vendas e cotações. Registe primeiro as entradas de dinheiro reais: o CSV Yahoo não as contém. Consulte [as regras da importação Yahoo](docs/milestone2.md#importação-do-yahoo-finance).
+
 Não são necessários login, cartão bancário, chave de API ou subscrição para usar a aplicação localmente. Nenhuma consulta externa é feita até configurar a fonte e pedir uma atualização. Fontes tipográficas e bibliotecas são servidas com a aplicação; não há CDN, publicidade ou telemetria.
 
 ## Compilar e verificar

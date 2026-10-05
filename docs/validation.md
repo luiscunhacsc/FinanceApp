@@ -1,5 +1,19 @@
 # Validação
 
+## Extensão do Marco 2 — CSV Yahoo Finance
+
+Verificado em 05/10/2026.
+
+- `npm run test`: 51 testes unitários/de integração aprovados, incluindo os oito novos testes de importação e todos os testes anteriores da fonte Yahoo/proxy.
+- `npm run build`: TypeScript, frontend e PWA compilados. Mantêm-se os avisos não bloqueantes de dimensão dos módulos e comentários na dependência Zod.
+- `npm run test:e2e`: 10 percursos aprovados em Chromium. Os dois novos verificam revisão de moeda/comissão, compra/venda, reimportação sem duplicação, persistência, largura móvel e bloqueio sem depósitos.
+- O ficheiro fornecido foi analisado localmente, sem gravação numa carteira: 40 operações (39 compras, uma venda), oito instrumentos, 26 comissões vazias e oito cotações datadas. Não foi copiado para o repositório nem usado como fixture; os testes usam dados sintéticos.
+- Falhas de saldo, venda excessiva e conflito de cotação foram verificadas com rollback de instrumentos, operações e preços. Os backups preservam os movimentos importados.
+- Inspeção visual do diálogo em 1440 px e 390 px; largura móvel do documento de 390 px, sem erros de página. Capturas regeneráveis com `node scripts/yahoo-preview.mjs` num perfil isolado.
+- A alteração final à página Metodologia foi compilada e a versão final foi aberta no percurso visual. O Worker e os serviços de alojamento não foram alterados.
+
+Limites: moedas, comissões vazias, preço de execução das vendas e convenção de hora exigem revisão. O CSV não fornece depósitos, identificadores únicos nem histórico diário de cotações; não permite sincronização automática de operações posteriormente corrigidas no Yahoo. Consulte [o guia de importação](milestone2.md#importação-do-yahoo-finance).
+
 ## Marco 2 — versão 0.2.0
 
 Verificado em 05/10/2026, em Windows.

@@ -66,6 +66,42 @@ IndexedDB passa da versão 1 para 2, preservando instrumentos, cotações, hist�
 
 ## Publicação
 
+O formato Yahoo Finance é reconhecido pelo mesmo botão de importação de movimentos, como descrito abaixo. Não requer uma API ou uma conta Yahoo ligada à aplicação.
+
 O processo mantém-se: `npm ci`, `npm run check`, `npm run test:e2e`; publicar `dist` como site estático. O Worker Yahoo não mudou. A compilação não publica nada nem ativa planos pagos. Siga [o guia de publicação gratuita](deployment.md).
 
 Antes de substituir uma versão já utilizada, exporte um backup. Após publicar, aceite a atualização da PWA quando terminar as edições; a migração da base é transacional. Para desenvolvimento local, portas/origens diferentes mantêm bases distintas.
+
+## Importação do Yahoo Finance
+
+1. Crie a carteira de destino e registe ou importe as entradas de dinheiro reais com as respetivas datas. O CSV analisado de My Portfolio contém operações, mas não depósitos nem levantamentos. O importador nunca inventa reforços para cobrir compras.
+2. Escolha **Importar movimentos CSV** e selecione o ficheiro Yahoo original. Não precisa de renomear colunas nem converter o separador.
+3. Confirme a moeda dos preços por símbolo. Pode aplicar um código a todos, se for efetivamente o mesmo. A moeda não é deduzida do nome ou sufixo; só pode vir dos metadados já guardados ou da confirmação explícita do utilizador. Esta confirmação não cria metadados de identidade do instrumento.
+4. Preencha comissões vazias ou confirme explicitamente que as restantes são zero. Zero escrito no ficheiro e campo vazio são tratados de forma diferente. Para moeda estrangeira, indique o câmbio de execução de cada operação, em EUR por unidade da moeda; o ficheiro não fornece essas taxas.
+5. Reveja os preços, em especial nas vendas, e aceite a convenção de datas. Clique em **Validar importação Yahoo**. Se faltar saldo, registe as entradas reais anteriores e volte a importar. Vendas excessivas também bloqueiam a importação.
+6. Reveja novos movimentos, duplicados, cotações e saldo final, e confirme. Os novos instrumentos, movimentos e cotações são guardados numa única transação IndexedDB; uma falha não deixa gravações parciais.
+
+### Mapeamento e limites
+
+| Campo Yahoo | Tratamento |
+| --- | --- |
+| Symbol | Símbolo; instrumentos novos ficam sem nome, ISIN ou TER até obter esses dados de uma fonte |
+| Transaction Type | BUY → compra; SELL → venda; quantidade positiva em ambos; outros tipos são rejeitados |
+| Trade Date | AAAAMMDD → data da operação; 12:00 UTC é uma hora convencional, identificada na nota, não uma hora de execução conhecida |
+| Purchase Price | Preço unitário da operação; nas linhas SELL, o utilizador confirma que é o preço da venda |
+| Quantity | Unidades, incluindo frações; preserva até 12 casas decimais |
+| Commission | Comissão na moeda confirmada; vazio exige preenchimento ou confirmação explícita de zero |
+| Comment | Texto preservado na nota, nunca executado; até 700 caracteres para permitir a informação de proveniência |
+| Current Price, Date, Time | Cotação independente, importação opcional; não substitui o preço de execução |
+| Open, High, Low, Volume, Change | Não são usados para reconstruir desempenho ou histórico diário |
+| High Limit, Low Limit | Não criam alertas; valores presentes geram aviso |
+
+As operações são ordenadas cronologicamente; empates no mesmo dia preservam a ordem das linhas do CSV. Como não existe hora de execução, confirme a ordem de compras e vendas desse dia antes de importar. As vendas usam FIFO; não existe correspondência de lotes no ficheiro. As datas introduzidas pelo utilizador no Yahoo são preservadas, incluindo fins de semana, sem serem deslocadas para um dia de bolsa.
+
+Cotações reconhecem fusos explícitos UTC/GMT, CET (+01:00) e CEST (+02:00). Datas/horas ou fusos não reconhecidos impedem a importação dessa cotação, com aviso, mas não invalidam operações válidas. Cotações repetidas iguais são reduzidas a uma observação por símbolo/instante; valores contraditórios bloqueiam o ficheiro. A data do NAV do PPR mantém-se, mesmo sendo anterior às restantes. Uma cotação atual não preenche automaticamente os dias históricos. Câmbios de valorização continuam separados dos câmbios de execução.
+
+O Yahoo não fornece um identificador por transação neste formato. O importador usa SHA-256 do conteúdo financeiro original (carteira, símbolo, dia, tipo, quantidade, preço e comissão) mais a ocorrência de linhas idênticas. Reordenar linhas ou atualizar cotações/comentários não duplica movimentos já importados. Duas operações financeiras iguais mantêm duas ocorrências. Moeda/câmbio/comissão preenchidos na revisão não alteram a identidade: diferenças em reimportações são bloqueadas como conflitos.
+
+**Não é sincronização:** alterar data, preço, quantidade, tipo ou comissão no Yahoo pode produzir uma identidade nova. Linhas removidas não eliminam transações locais. É necessário reconciliar estas alterações. Movimentos semelhantes previamente registados por outra via são bloqueados para evitar duplicação; não se tenta adivinhar se são a mesma operação. Alterações de comentários a movimentos já importados não substituem as notas locais. Cotações existentes com outro preço/moeda no mesmo instante também geram conflito.
+
+O importador lê apenas o ficheiro local, sem enviar o seu conteúdo a serviços externos. CSV pessoal não faz parte dos testes nem é incorporado na aplicação. Os testes usam dados sintéticos. Para inspecionar apenas a estrutura de um ficheiro sem importar dados: `node scripts/inspect-yahoo.mjs caminho/portfolio.csv`.
